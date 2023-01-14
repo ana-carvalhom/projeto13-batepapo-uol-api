@@ -12,4 +12,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.listen(5000, ()=> console.log("The App is running in port 5000"))
+const mongoClient = new MongoClient(process.env.DATABASE_URL)
+let db
+mongoClient.connect().then( () => {
+    db = mongoClient.db()
+})
+
+
+app.listen(5000, ()=> console.log("The App is running in port 5000"));
+
