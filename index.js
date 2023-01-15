@@ -80,9 +80,43 @@ app.get("/participants", async (req, res) => {
     } catch (error) {
         res.status(500).send(error.message)
     }
-})
+});
+
+app.post("./messages", async (req, res) => {
+    const {to, text, type} = req.body; 
+    const {user} = req.headers;
+
+try {
+    const message = {
+    from: user,
+    to: to,
+    text: text,
+    type: type,
+    time: dayjs().format("HH:mm:ss")
+    };
+
+    const validating = schemaMessage.validate(message, {abortEarly: false});
+    if (validating.error) {
+        const errors = validating.error.details.map((detail) => detail.message);
+        res.status(422).send(errors);
+        return;
+    } 
+
+    const participantIsReal = await db.collection("participants").findOne({name: user})
+            if(!participantIsReal){
+                res.send(409);
+                return
+            }
+            
+    await db.collection("messages").insertOne(message);
+    res.send(201);
 
 
+} catch (error) {
+    res.status(500).send(error.message)
+}
+
+});
 
 
 app.listen(5000, ()=> console.log("The App is running in port 5000"));
