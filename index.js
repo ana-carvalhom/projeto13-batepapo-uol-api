@@ -12,12 +12,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const mongoClient = new MongoClient(process.env.DATABASE_URL)
-let db
-mongoClient.connect().then( () => {
-    db = mongoClient.db()
-});
+const mongoClient = new MongoClient(process.env.DATABASE_URL);
+let db;
 
+// mongoClient.connect().then( () => {
+//     db = mongoClient.db()
+// });
+
+try {
+await mongoClient.connect();
+db = mongoClient.db();
+} catch (error) {
+    console.log(error)
+
+}
 
 const schemaParticipant = joi.object({
     name: joi.string().min(1).required(),
