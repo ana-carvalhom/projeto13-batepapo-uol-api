@@ -132,10 +132,37 @@ app.get("/messages", async(req, res) => {
         return publicMessage || privateMessage
     } )
 
-    res.send(allMessages.slice(-limit))
+    res.send(messagesFilter.slice(-limit))
     } catch (error) {
     res.status(500).send(error.message);
     }
 })
+
+
+app.post("/status", async(req, res) => {
+    const {user} = req.headers;
+
+    try {
+        const participantIsReal = await db .collection("participants").findOne({name: user});
+
+        if (!participantIsReal) {
+            res.sendStatus(404);
+            return;
+        }
+
+        await db.collection("participants").updateOne({name: user},{$set: {lastStatus: Data.now()}});
+
+        res.send(200);
+
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
+
+
+
+
 app.listen(5000, ()=> console.log("The App is running in port 5000"));
 
