@@ -160,7 +160,37 @@ app.post("/status", async(req, res) => {
     }
 })
 
+setInterval( async () => {
+    const countSeconds = Date.now() - 10 * 1000;
 
+
+    try {
+        const deactivateParticipants = await db.collection("participants").find({lastStatus: {$lte: countSeconds}}).toArray();
+
+        if(deactivateParticipants.length > 0 ){
+            const automaticResponse = deactivateParticipants.map(deactivateParticipants =>
+                {
+                    return{
+                        from: deactivateParticipants.name,
+                        to: 'Todos', 
+                        text: 'sai da sala...',
+                        type: 'status',
+                        time: dayjs().format('HH:MM:SS'),
+
+                    };
+                });
+
+                await db.collection("messages").insertMany(automaticResponse)
+
+                await db.collection("participants").deleteMany( {lastStatus: {$lte: countSeconds}})
+        }
+
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+
+}, 15000)
 
 
 
