@@ -82,7 +82,7 @@ app.get("/participants", async (req, res) => {
     }
 });
 
-app.post("./messages", async (req, res) => {
+app.post("/messages", async (req, res) => {
     const {to, text, type} = req.body; 
     const {user} = req.headers;
 
@@ -118,6 +118,24 @@ try {
 
 });
 
+app.get("/messages", async(req, res) => {
 
+    const limit = Number(req.query.limit);
+    const {user} = req.headers;
+
+    try{
+    const allMessages = await db.collection("messages").find({}).toArray();
+    const messagesFilter = allMessages.filter(message => {
+        const publicMessage = message.type === "message";
+        const privateMessage = message.to === "Todos" || message.to === user || message.from === user
+;
+        return publicMessage || privateMessage
+    } )
+
+    res.send(allMessages.slice(-limit))
+    } catch (error) {
+    res.status(500).send(error.message);
+    }
+})
 app.listen(5000, ()=> console.log("The App is running in port 5000"));
 
