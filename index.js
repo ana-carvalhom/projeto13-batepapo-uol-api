@@ -53,7 +53,7 @@ app.post("/participants", async (req, res) => {
             }
 
             await db.collection("participants").insertOne({name: participantName.name, lastStatus: Date.now()})
-            await db.collection("message").insertOne(
+            await db.collection("messages").insertOne(
             {from: participantName.name,
              to: 'Todos', 
              text: 'entra na sala...', 
