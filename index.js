@@ -68,7 +68,19 @@ app.post("/participants", async (req, res) => {
 
     })
 
-  
+app.get("/participants", async (req, res) => {
+    try {
+        const allParticipants = await db.collection("participants").find().toArray();
+        if (!allParticipants) {
+            res.status(404).send("No participants found");
+            return;
+        }
+
+        res.send(allParticipants);
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
 
 
 
